@@ -43,7 +43,7 @@ const message = (to, token) => {
     to,
     from: "kursnode12345@gmail.com",
     subject: "Your newsletter",
-    text: `/users/verify/${token}`,
+    text: `http://localhost:3000/api/users/verify/${token}`,
     html: `<strong>"Hello!!!"</strong>`,
   };
 };
@@ -92,6 +92,12 @@ export const login = async (req, res, next) => {
 
   const user = await getUserByMail(email);
   if (!user) return res.status(401).send("Email or password is wrong");
+
+  if (!user.verify) {
+    return res
+      .status(401)
+      .send("Email not verified. Please verify your email before logging in.");
+  }
 
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (!isValidPassword)
